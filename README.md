@@ -62,11 +62,18 @@ docker run -d --name mongo1 --network cap-test mongo --replSet rs0
 docker run -d --name mongo2 --network cap-test mongo --replSet rs0
 docker run -d --name mongo3 --network cap-test mongo --replSet rs0
 ```
+
+Ou inicialize tudo pelo docker compose
+
+```bash
+docker compose up
+```
+
 **Inicializar o cluster de réplicas:**
 Conecte-se ao container mongo1 para configurar o cluster:
 
 ```bash
-docker exec -it mongo1 mongo
+docker exec -it mongo1 mongosh
 ```
 
 No shell do MongoDB:
@@ -96,7 +103,7 @@ docker network disconnect cap-test mongo2
 - Configure o MongoDB para permitir operações de escrita mesmo em caso de partição. No **mongo1**, execute:
 
 ```javascript
-rs.slaveOk();
+rs.status().members.map(i => ({ name: i.name, health: i.health, state: i.stateStr }));
 ```
 - Simule uma partição novamente:
 
@@ -127,6 +134,12 @@ Após os testes, remova os containers e a rede:
 ```bash
 docker rm -f mongo1 mongo2 mongo3
 docker network rm cap-test
+```
+
+ou
+
+```bash
+docker compose down
 ```
 ---
 
